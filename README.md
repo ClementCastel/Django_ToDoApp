@@ -1,8 +1,12 @@
 # Django_ToDoApp
 To Do app built in Django
 
-### DAY 1
-- Admin panel : List -> Tasks inline
-- App :
-	- /todo/ : list unfinished tasks
-	- /todo/finished : list finished tasks
+---
+## API:
+### tasks:
+GET
+- /<uuid>/all/ : all tasks
+- /<uuid>/unfinished/ : unfinished tasks
+- /<uuid>/next/<int>/ : n(int) last tasks
+- /<uuid>/past/ : overdue tasks
+- /<uuid>/future : upcoming tasks
