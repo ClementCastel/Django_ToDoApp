@@ -15,7 +15,49 @@ def getAllUsers (request):
 
 
 def all (request, uuid):
-	tasks = Task.objects.order_by('finishDate')
+	tasks = Task.objects.filter(userUUID=uuid).order_by('finishDate')
 	context = {'tasks': tasks, 'title': 'Index'}
 
 	return render(request, 'todo/index.html', context)
+
+
+def unfinished (request, uuid):
+	tasks = Task.objects.order_by('finishDate')
+
+	context = {'tasks': tasks}
+
+	return HttpResponse("unfinished")
+
+
+def finished (request, uuid):
+	tasks = Task.objects.order_by('finishDate')
+
+	context = {'tasks': tasks}
+
+	return HttpResponse("finished")
+
+
+def next (request, uuid, next):
+	tasks = Task.objects.order_by('finishDate')
+
+	context = {'tasks': tasks}
+
+	return HttpResponse("next")
+
+
+def past (request, uuid):
+	# datetime.now()
+	tasks = Task.objects.order_by('finishDate')
+
+	context = {'tasks': tasks}
+
+	return HttpResponse("past")
+
+
+def future (request, uuid):
+	# datetime.now()
+	tasks = Task.objects.order_by('finishDate')
+
+	context = {'tasks': tasks}
+
+	return HttpResponse("future")
