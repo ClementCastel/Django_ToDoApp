@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import List, Task
+from .models import User, Task
 
 # Register your models here.
 
@@ -12,8 +12,13 @@ class TaskInLine(admin.TabularInline):
 	model = Task
 	extra = 1
 
-class ListAdmin(admin.ModelAdmin):
-	fieldsets = [(None, {'fields': ['title']}), ]
+class UserAdmin(admin.ModelAdmin):
+	fieldsets = [(None, {'fields': ['email']}), (None, {'fields': ['password']}), (None, {'fields': ['firstname']}), (None, {'fields': ['lastname']})]
 	inlines = [TaskInLine]
 
-admin.site.register(List, ListAdmin)
+	'''email = models.EmailField(max_length=100)
+	password = models.CharField(max_length=130)
+	firstName = models.CharField(max_length=100)
+	lastname = models.CharField(max_length=100)'''
+
+admin.site.register(User, UserAdmin)

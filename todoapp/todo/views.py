@@ -1,18 +1,21 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 
-from .models import Task, List
+from .models import User, Task
 # Create your views here.
 
-def index (request):
+def getAllUsers (request):
+	users = User.objects.all()
+	context = {'users': users}
+	print('USERS : ')
+	print(context)
+	response = HttpResponse()
+	response.write("DEBUG : OK")
+	return response
 
-	tasks = Task.objects.filter(finished=False).order_by('finishDate')
+
+def all (request, uuid):
+	tasks = Task.objects.order_by('finishDate')
 	context = {'tasks': tasks, 'title': 'Index'}
-
-	return render(request, 'todo/index.html', context)
-
-def finished (request):
-
-	tasks = Task.objects.filter(finished=True).order_by('-finishDate')
-	context = {'tasks': tasks, 'title': 'Finished'}
 
 	return render(request, 'todo/index.html', context)
