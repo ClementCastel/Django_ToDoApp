@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import make_password,check_password
 
 from datetime import datetime
 import json
@@ -89,7 +90,7 @@ def userRegister (request):
 		if request.POST.get('firstname', None) is not None and request.POST.get('lastname', None) is not None and request.POST.get('email', None) is not None and request.POST.get('password', None) is not None:
 			exists = User.objects.filter(email=request.POST['email']).count()
 			if exists == 0:
-				user = User.create(request.POST['email'], request.POST['password'], request.POST['firstname'], request.POST['lastname'])
+				user = User.create(request.POST['email'], make_password(request.POST['password']), request.POST['firstname'], request.POST['lastname'])
 				user.full_clean()
 				user.save()
 				return HttpResponse("user created", status=201)
@@ -105,8 +106,8 @@ def userLogin (request):
 	#POST
 	if request.method == 'POST':
 		if request.POST.get('email', None) is not None and request.POST.get('password', None) is not None:
-			user = User.objects.filter(email=request.POST['email'], password=request.POST['password'])
-			if user and user[0]:
+			user = User.objects.filter(email=request.POST['email'])
+			if user and user[0] and check_password(password=request.POST['password'], encoded=user[0].password):
 				return HttpResponse(user[0].uuid, status=200)
 			else:
 				return HttpResponse('user not found', status=404)
@@ -120,9 +121,10 @@ def userLogin (request):
 def userDelete (request):
 	#POST
 	if request.method == 'POST':
+		print(request.POST)
 		if request.POST.get('email', None) is not None and request.POST.get('password', None) is not None:
-			user = User.objects.filter(email=request.POST['email'], password=request.POST['password'])
-			if user and user[0]:
+			user = User.objects.filter(email=request.POST['email'])
+			if user and user[0] and check_password(password=request.POST['password'], encoded=user[0].password):
 				#delete user
 				user[0].delete()
 				return HttpResponse('user deleted', status=202)
