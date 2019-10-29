@@ -12,6 +12,12 @@ class User (models.Model):
 	lastname = models.CharField(max_length=100)
 	registerDate = models.DateTimeField(auto_now=True)
 
+
+	@classmethod
+	def create (cls, email, password, firstname, lastname):
+		user = cls(email=email, password=password, firstname=firstname, lastname=lastname)
+		return user
+
 	def __str__ (self):
 		return str(self.uuid)
 
