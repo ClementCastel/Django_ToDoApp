@@ -16,3 +16,16 @@ POST
 - /users/register/ <i>(POST: firstname/lastname/email/password)</i> : add user to DB
 - /users/login/ <i>(POST: email/password)</i> : get the UUID of a user
 - /users/delete/ <i>(POST: email/password)</i> : remove user from DB
+
+
+TODO :
+Web Client:
+- Design
+- Template
+- JS animations
+- Client querying api
+
+Android Client:
+- Configure Android Studio/Flutter
+- App template
+- Client querying api
