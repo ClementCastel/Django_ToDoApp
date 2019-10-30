@@ -131,7 +131,6 @@ html, body {
 	width: 100%;
 	height: calc(100% - 257px);
 	background-color: #F8FBFC;
-
 	overflow-y: scroll;
 }
 
@@ -139,9 +138,11 @@ html, body {
 	margin-left: auto;
 	margin-right: auto;
 	width: 80%;
-	height: 42px;
+	display: block;
+overflow: auto;
 	background-color: white;
-	line-height: 42px;
+	line-height: 21px;
+	min-height: 42px;
 	font-size: 14px;
 	border-radius: 3px;
 	box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.0416667);
@@ -156,6 +157,8 @@ html, body {
 	float: left;
 	font-weight: bold;
 	padding-left: 7px;
+	margin-top:10.5px;
+	margin-bottom: 10.5px;
 }
 .taskDate {
 	float:right;
