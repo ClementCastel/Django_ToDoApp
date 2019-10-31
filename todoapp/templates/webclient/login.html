@@ -36,6 +36,9 @@
 		</div>
 	</div>
 	<script type="text/javascript">
+
+	if (document.cookie.indexOf('uuid=') != -1) { window.location.href = "http://localhost:8000/webclient/tasks" }
+
 	let BASE_URL = "http://localhost:8000/api/v1";
 
 	function login () {
@@ -57,7 +60,6 @@
 			return res.text()
 		})
 		.then ((data) => {
-			console.log(data);
 			setCookie('uuid', data, 14)
 			alert("Connecté !")
 			window.location.href = "http://localhost:8000/webclient/tasks"
@@ -75,7 +77,6 @@
 	        expires = "; expires=" + date.toUTCString();
 	    }
 	    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-	    console.log(document.cookie);
 	}
 
 	</script>

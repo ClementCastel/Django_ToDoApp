@@ -5,7 +5,7 @@
 	<link rel="stylesheet" type="text/css" href="static/add.css">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
-<body>
+<body style="user-select: none;">
 	<style type="text/css">
 		.fa-check-circle {
 			font-size: 16px;
@@ -129,7 +129,10 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-		/* REDIRECTION VERS /login SI LE COOKIE 'UUID' N'EST PAS DÉFINI*/
+		let uuid = "";
+
+		if (document.cookie.indexOf('uuid=') == -1) { window.location.href = "http://localhost:8000/webclient/tasks" }
+		else { uuid = document.cookie.match('(^|;) ?uuid=([^;]*)(;|$)')[2] }
 
 		const UUID = "e7946b07-252a-4764-98c6-9edffdd3e047";
 		const BASE_URL = "http://localhost:8000/api/v1";
@@ -159,15 +162,19 @@
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 		function getTasks () {
-			const tasks = fetch (BASE_URL+'/'+UUID+"/all/")
+			const tasks = fetch (BASE_URL+'/'+UUID+"/unfinished/")
 	        .then ((res) => {
 				return res.json()
 			})
 			.then ((data) => {
 				let tasks = document.getElementById('tasks')
 				tasks.innerHTML = "<div style='height:15px;width:100%;'></div>"
+				let cpt = 1;
 				for (task of data) {
+					let now = new Date()
 					let date = new Date(task.finishDate*1000)
+					let late = false
+					if (date < now) late = true
 					let timeD = date.getUTCDate()+"/"+(date.getMonth()+1)
 					let hours = date.getHours()
 					let minutes = date.getMinutes()
@@ -176,19 +183,28 @@
 					timeH += hours+":"
 					if (minutes < 10) timeH += "0"
 					timeH += minutes
-					console.log(date);
-					let html = "<div class='task'><div class='taskText'>"+task.title+"</div><div class='taskDate'>"+timeD+" · <b>"+timeH+"</b></div></div>"
+					let html = "<div class='task' id='task"+cpt+"' onclick='finishTask(\`task"+cpt+"`)'><div class='taskText'>"+task.title+"</div><div class='taskDate'>"
+					html += "<span style='color:red;'>"+timeD+" · <b>"+timeH+"</b></span></div></div>"
 					tasks.innerHTML += html
+					cpt++
 				}
-
-
-/*			<div style="height:15px;width:100%;"></div>
-			<div class="task">
-				<div class="taskText finished"><i class="fa fa-check-circle"></i>Task number 1:<br>- subTask 1<br>- subTask2<br>- subTask3</div>
-				<div class="taskDate">01/10 · <b>08:00</b></div>
-			</div>
-*/
 			});
+		}
+
+
+		function finishTask (taskId) {
+			if (document.getElementById(taskId).getElementsByClassName('taskText')[0].classList.contains('finished')) { //UNFINISH
+				document.getElementById(taskId).getElementsByClassName('taskText')[0].classList.remove('finished');
+				document.getElementById(taskId).getElementsByClassName('taskText')[0].removeChild(document.getElementById(taskId).getElementsByClassName('taskText')[0].firstChild);
+			} else { // FINISH
+				let task = document.getElementById(taskId);
+				let titleHTML = task.getElementsByClassName('taskText')[0].innerHTML;
+				titleHTML = "<i class='fa fa-check-circle'></i>"+titleHTML;
+
+				task.getElementsByClassName('taskText')[0].innerHTML = titleHTML;
+				document.getElementById(taskId).getElementsByClassName('taskText')[0].classList.add('finished');
+			}
+			
 		}
 
 
