@@ -21,63 +21,141 @@ def getAllUsers (request):
 
 
 def all (request, uuid):
-	tasks = Task.objects.filter(userUUID=uuid).order_by('finishDate').values('title', 'finishDate')
+	tasks = Task.objects.filter(userUUID=uuid).order_by('finishDate').values('uuid', 'title', 'finishDate', 'finished')
 
 	data = []
 	for t in tasks:
-		data.append({'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate'])})
+		data.append({'uuid': str(t['uuid']),'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate']), 'finished': t['finished']})
 
 	return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 def unfinished (request, uuid):
-	tasks = Task.objects.filter(userUUID=uuid).filter(finished=False).order_by('finishDate').values('title', 'finishDate')
+	tasks = Task.objects.filter(userUUID=uuid).filter(finished=False).order_by('finishDate').values('uuid', 'title', 'finishDate', 'finished')
 
 	data = []
 	for t in tasks:
-		data.append({'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate'])})
+		data.append({'uuid': str(t['uuid']),'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate']), 'finished': t['finished']})
 
 	return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 def finished (request, uuid):
-	tasks = Task.objects.filter(userUUID=uuid).filter(finished=True).order_by('finishDate').values('title', 'finishDate')
+	tasks = Task.objects.filter(userUUID=uuid).filter(finished=True).order_by('finishDate').values('uuid', 'title', 'finishDate', 'finished')
 
 	data = []
 	for t in tasks:
-		data.append({'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate'])})
+		data.append({'uuid': str(t['uuid']),'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate']), 'finished': t['finished']})
 
 	return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 def next (request, uuid, next):
-	tasks = Task.objects.filter(userUUID=uuid).filter(finished=False).order_by('finishDate').values('title', 'finishDate')[:next]
+	tasks = Task.objects.filter(userUUID=uuid).filter(finished=False).order_by('finishDate').values('uuid', 'title', 'finishDate', 'finished')[:next]
 
 	data = []
 	for t in tasks:
-		data.append({'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate'])})
+		data.append({'uuid': str(t['uuid']),'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate']), 'finished': t['finished']})
 
 	return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 def past (request, uuid):
-	tasks = Task.objects.filter(userUUID=uuid).filter(finished=False).filter(finishDate__lt=datetime.now()).order_by('finishDate').values('title', 'finishDate')
+	tasks = Task.objects.filter(userUUID=uuid).filter(finished=False).filter(finishDate__lt=datetime.now()).order_by('finishDate').values('uuid', 'title', 'finishDate', 'finished')
 
 	data = []
 	for t in tasks:
-		data.append({'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate'])})
+		data.append({'uuid': str(t['uuid']),'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate']), 'finished': t['finished']})
 
 	return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 def future (request, uuid):
-	tasks = Task.objects.filter(userUUID=uuid).filter(finished=False).filter(finishDate__gt=datetime.now()).order_by('finishDate').values('title', 'finishDate')
+	tasks = Task.objects.filter(userUUID=uuid).filter(finished=False).filter(finishDate__gt=datetime.now()).order_by('finishDate').values('uuid', 'title', 'finishDate', 'finished')
 
 	data = []
 	for t in tasks:
-		data.append({'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate'])})
+		data.append({'uuid': str(t['uuid']),'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate']), 'finished': t['finished']})
 
 	return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def finish (request, uuid, task):
+	exists = Task.objects.filter(userUUID=uuid).filter(uuid=task).count()
+
+	if exists != 0:
+		task = Task.objects.filter(userUUID=uuid).filter(uuid=task)[0]
+		task.finished = True
+		task.save()
+		return HttpResponse(status=200)
+	else:
+		return HttpResponse(status=404)
+
+
+def unfinish (request, uuid, task):
+	exists = Task.objects.filter(userUUID=uuid).filter(uuid=task).count()
+
+	if exists != 0:
+		task = Task.objects.filter(userUUID=uuid).filter(uuid=task)[0]
+		task.finished = False
+		task.save()
+		return HttpResponse(status=200)
+	else:
+		return HttpResponse(status=404)
+
+@csrf_exempt
+def add (request, uuid):
+	#POST
+	if request.method == 'POST':
+		if request.POST.get('title', None) is not None and request.POST.get('date', None) is not None:
+			user = User.objects.filter(uuid=uuid)
+			if user and user[0]: #user is registered
+				date = datetime.utcfromtimestamp(int(request.POST['date'])).strftime('%Y-%m-%d %H:%M:%S')
+				task = Task.create(request.POST['title'], date, user[0])
+				task.full_clean()
+				task.save()
+				return HttpResponse("task created", status=201)
+			else:
+				return HttpResponse('user doesn\'t exists', status=404)
+		elif request.body is not None:
+			body_unicode = request.body.decode('utf-8')
+			body = json.loads(body_unicode)
+			title = body['title']
+			date = body['date']
+			user = User.objects.filter(uuid=uuid)
+			if user and user[0]: #user is registered
+				date = datetime.utcfromtimestamp(int(date)).strftime('%Y-%m-%d %H:%M:%S')
+				task = Task.create(title, date, user[0])
+				task.full_clean()
+				task.save()
+				return HttpResponse("task created", status=201)
+			else:
+				return HttpResponse('user doesn\'t exists', status=404)
+
+
+		else:
+			return HttpResponse("invalid POST request", status=404)
+	else:
+		return HttpResponse(status=405)
+
+
+
+
+
+
+
 
 
 

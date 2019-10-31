@@ -281,6 +281,9 @@ input[type="text"],input[type="date"],input[type="time"] {
 	line-height: 18px;
 	margin-bottom: 15px;
 }
+#timePicker {
+	width: 60px;
+}
 .close {
 	color:white;
 	float: right;

@@ -23,9 +23,15 @@ class User (models.Model):
 
 class Task (models.Model):
 	userUUID = models.ForeignKey(User, on_delete=models.CASCADE)
+	uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	title = models.CharField(max_length=300)
 	finishDate = models.DateTimeField('deadline date')
 	finished = models.BooleanField(default=False)
+
+	@classmethod
+	def create (cls, title, finishDate, userUUID):
+		task = cls(title=title, finishDate=finishDate, userUUID=userUUID)
+		return task
 
 	def __str__ (self):
 		return self.title

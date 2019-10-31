@@ -14,6 +14,10 @@ urlpatterns = [
 	path('<uuid:uuid>/next/<int:next>/', views.next, name='next'),
 	path('<uuid:uuid>/past/', views.past, name='past'),
 	path('<uuid:uuid>/future/', views.future, name='future'),
+	# FINISH / UNFINISH
+	path('<uuid:uuid>/finish/<uuid:task>/', views.finish, name='finish'),
+	path('<uuid:uuid>/unfinish/<uuid:task>/', views.unfinish, name='unfinish'),
+	path('<uuid:uuid>/add/', views.add, name='unfinish'),
 	# USER MODEL
 	path('users/delete/', views.userDelete, name='delete user'),
 	path('users/register/', views.userRegister, name='register user'),
