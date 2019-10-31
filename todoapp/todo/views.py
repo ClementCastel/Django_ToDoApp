@@ -111,8 +111,24 @@ def userLogin (request):
 				return HttpResponse(user[0].uuid, status=200)
 			else:
 				return HttpResponse('user not found', status=404)
+		elif request.body is not None:
+			body_unicode = request.body.decode('utf-8')
+			body = json.loads(body_unicode)
+			email = body['email']
+			password = body['password']
+			user = User.objects.filter(email=email)
+			print("email : "+str(email))
+			if user and user[0] and check_password(password=password, encoded=user[0].password):
+				print(user[0].uuid)
+				return HttpResponse(""+str(user[0].uuid), status=200)
+			else:
+				return HttpResponse('user not found', status=404)
 		else:
+			print(request.body)
+			print("email : "+request.POST.get('email', 'none')+" : : "+request.POST.get('password', 'none'))
 			return HttpResponse('invalid POST request', status=404)
+	elif request.method == 'OPTIONS':
+		return HttpResponse(status=200)
 	else:
 		return HttpResponse(status=405)
 

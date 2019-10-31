@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login - ToDo APP</title>
+	<link rel="stylesheet" type="text/css" href="static/login.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+	<style type="text/css">
+		/*
+			Style for font-awesome icons
+		*/
+	</style>
+	<div class="frame">
+		<div class="titleHandler">
+			<h1 class="title">ToDo APP</h1>
+		</div>
+
+		<div class="main">
+			<div class="formSpacer"></div>
+			<div class="formHandler">
+				<h2>Login</h2>
+				<form>
+					<p>Email</p>
+					<input type="email" name="email" placeholder="email" value="cc@cc.fr">
+					<p>Password</p>
+					<input type="password" name="password" placeholder="password" value="aaZZ&!45">
+					<p></p>
+					
+				</form>
+				<button onclick="login();" class="loginButton">Login</button>
+			</div>
+		</div>
+		<div class="footer">
+			New user ? <a href="#signup"><b>Sign up</b></a>
+		</div>
+	</div>
+	<script type="text/javascript">
+	let BASE_URL = "http://localhost:8000/api/v1";
+
+	function login () {
+		let email = document.getElementsByName('email')[0].value;
+		let password = document.getElementsByName('password')[0].value;
+		console.log(email+":"+password);
+
+		const uuid = fetch (BASE_URL+'/users/login/', {
+			method: 'POST',
+			headers:{
+				'Content-Type': 'application/json'
+			},
+		    body: JSON.stringify({
+				email: email,
+				password: password
+			})			
+		})
+        .then ((res) => {
+			return res.text()
+		})
+		.then ((data) => {
+			console.log(data);
+			setCookie('uuid', data, 14)
+			alert("Connecté !")
+			window.location.href = "http://localhost:8000/webclient/tasks"
+		})
+		.catch ((err) => {
+			alert("Utilisateur inconnu :(")
+		});        
+	}
+
+	function setCookie(name,value,days) {
+	    var expires = "";
+	    if (days) {
+	        var date = new Date();
+	        date.setTime(date.getTime() + (days*24*60*60*1000));
+	        expires = "; expires=" + date.toUTCString();
+	    }
+	    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+	    console.log(document.cookie);
+	}
+
+	</script>
+</body>
+</html>
