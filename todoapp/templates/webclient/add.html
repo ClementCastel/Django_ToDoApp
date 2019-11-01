@@ -173,19 +173,132 @@
 		/* - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 		function getTasks () {
+			let today = new Date();
+			today.setHours(0);
+			today.setMinutes(0);
+			today.setSeconds(0);
+			let todayTime = parseInt(today.getTime()/1000);
+			let oneDay = 24*60*60;
+
+
+			document.getElementById('tasks').innerHTML = "<div style='height:15px;width:100%;'></div>" //RESET <div>
+			// RETARD (/late/)
+			// AUJOURD'HUI (/today/)
+			// DEMAIN (/tomorrow/)
+			// CETTE SEMAINE /
+			// CE MOIS-CI
+
+			const late = fetch(BASE_URL+'/'+UUID+"/between/0/"+todayTime+"/")
+			.then ((res) => {
+				return res.json()
+			})
+			.then ((data) => {
+				let tasks = document.getElementById('tasks')
+				if (data.length > 0) {
+					tasks.innerHTML += "<div class='dayInfo'>Retard:</div>"
+					showTasks(data)	
+				}
+			})
+			.then ( () => {
+				const day = fetch(BASE_URL+'/'+UUID+"/between/"+todayTime+"/"+(todayTime+oneDay)+"/")
+				return day
+			}
+			)
+			.then ((res) => {
+				return res.json()
+			})
+			.then ((data) => {
+				let tasks = document.getElementById('tasks')
+				if (data.length > 0) {
+					tasks.innerHTML += "<div class='dayInfo'>aujourd'hui:</div>"
+					showTasks(data)	
+				}
+			})
+			.then ( () => {
+				const tomorrow = fetch(BASE_URL+'/'+UUID+"/between/"+(todayTime+oneDay)+"/"+(todayTime+2*oneDay)+"/")
+				return tomorrow
+			}
+			)
+			.then ((res) => {
+				return res.json()
+			})
+			.then ((data) => {
+				let tasks = document.getElementById('tasks')
+				if (data.length > 0) {
+					tasks.innerHTML += "<div class='dayInfo'>demain:</div>"
+					showTasks(data)	
+				}
+			})
+			.then ( () => {
+				const week = fetch(BASE_URL+'/'+UUID+"/between/"+(todayTime+2*oneDay)+"/"+(todayTime+7*oneDay)+"/")
+				return week
+			}
+			)
+			.then ((res) => {
+				return res.json()
+			})
+			.then ((data) => {
+				let tasks = document.getElementById('tasks')
+				if (data.length > 0) {
+					tasks.innerHTML += "<div class='dayInfo'>cette semaine:</div>"
+					showTasks(data)	
+				}
+			})
+			.then( () => {
+				const month = fetch(BASE_URL+'/'+UUID+"/between/"+(todayTime+7*oneDay)+"/"+(todayTime+31*oneDay)+"/")
+				return month
+			}
+			)
+			.then ((res) => {
+				return res.json()
+			})
+			.then ((data) => {
+				let tasks = document.getElementById('tasks')
+				if (data.length > 0) {
+					tasks.innerHTML += "<div class='dayInfo'>ce mois-ci:</div>"
+					showTasks(data)	
+				}
+			})
+			.then( () => {
+				const year = fetch(BASE_URL+'/'+UUID+"/between/"+(todayTime+31*oneDay)+"/"+(todayTime+365*oneDay)+"/")
+				return year
+			}
+			)
+			.then ((res) => {
+				return res.json()
+			})
+			.then ((data) => {
+				let tasks = document.getElementById('tasks')
+				if (data.length > 0) {
+					tasks.innerHTML += "<div class='dayInfo'>cette année:</div>"
+					showTasks(data)	
+				}
+				document.getElementById('tasks').innerHTML += "<div style='height:25px;width:100%;'></div>" //BOTTOM SPACER
+				console.log(window.screen.height-357);
+				document.getElementsByClassName('main')[0].style.maxHeight = (window.screen.height-200)+"px";
+			});
+
+/*
 			const tasks = fetch (BASE_URL+'/'+UUID+"/unfinished/")
 	        .then ((res) => {
 				return res.json()
 			})
 			.then ((data) => {
 				let tasks = document.getElementById('tasks')
-				tasks.innerHTML = "<div style='height:15px;width:100%;'></div>"
-				let cpt = 1;
+				if (data.length > 0) {
+					tasks.innerHTML += "<div class='dayInfo'>all:</div>"
+					showTasks(data)	
+				}
+			});*/
+		}
+
+		function showTasks (data) {
+				let tasks = document.getElementById('tasks')
+
 				for (task of data) {
-					let now = new Date()
 					let date = new Date(task.finishDate*1000)
 					let late = false
-					if (date < now) late = true
+					if (date < (new Date())) late = true
 					let timeD = date.getUTCDate()+"/"+(date.getMonth()+1)
 					let hours = date.getHours()
 					let minutes = date.getMinutes()
@@ -194,12 +307,15 @@
 					timeH += hours+":"
 					if (minutes < 10) timeH += "0"
 					timeH += minutes
+
 					let html = "<div class='task' id='"+task.uuid+"' onclick='finishTask(\`"+task.uuid+"`)'><div class='taskText'>"+task.title+"</div><div class='taskDate'>"
-					html += "<span style='color:red;'>"+timeD+" · <b>"+timeH+"</b></span></div></div>"
+					if (late) { 
+						html += "<span style='color:red;'>"+timeD+" · <b>"+timeH+"</b></span></div></div>"
+					} else {
+						html += timeD+" · <b>"+timeH+"</b></div></div>"
+					}
 					tasks.innerHTML += html
-					cpt++
 				}
-			});
 		}
 
 

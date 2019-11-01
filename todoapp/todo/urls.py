@@ -14,6 +14,7 @@ urlpatterns = [
 	path('<uuid:uuid>/next/<int:next>/', views.next, name='next'),
 	path('<uuid:uuid>/past/', views.past, name='past'),
 	path('<uuid:uuid>/future/', views.future, name='future'),
+	path('<uuid:uuid>/between/<int:start>/<int:end>/', views.between, name='between'),
 	# FINISH / UNFINISH
 	path('<uuid:uuid>/finish/<uuid:task>/', views.finish, name='finish'),
 	path('<uuid:uuid>/unfinish/<uuid:task>/', views.unfinish, name='unfinish'),

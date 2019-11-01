@@ -80,6 +80,17 @@ def future (request, uuid):
 	return HttpResponse(json.dumps(data), content_type='application/json')
 
 
+def between (request, uuid, start, end):
+	startDate = datetime.utcfromtimestamp(int(start)).strftime('%Y-%m-%d %H:%M:%S')
+	endDate = datetime.utcfromtimestamp(int(end)).strftime('%Y-%m-%d %H:%M:%S')
+
+	tasks = Task.objects.filter(userUUID=uuid).filter(finished=False).filter(finishDate__gt=startDate, finishDate__lt=endDate).order_by('finishDate').values('uuid', 'title', 'finishDate', 'finished')
+
+	data = []
+	for t in tasks:
+		data.append({'uuid': str(t['uuid']),'title': t['title'], 'finishDate': datetime.timestamp(t['finishDate']), 'finished': t['finished']})
+
+	return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 
